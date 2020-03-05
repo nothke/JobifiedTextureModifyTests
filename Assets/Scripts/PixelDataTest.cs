@@ -7,6 +7,9 @@ using Unity.Collections;
 using Unity.Jobs;
 using Unity.Burst;
 
+using Unity.Mathematics;
+using static Unity.Mathematics.math;
+
 public class PixelDataTest : MonoBehaviour
 {
     public Texture2D texture;
@@ -22,14 +25,29 @@ public class PixelDataTest : MonoBehaviour
         }
     }
 
-    const int SIZE = 1024;
+    [BurstCompile]
+    struct SetNoisePixelsJob : IJobParallelFor
+    {
+        [WriteOnly] public NativeArray<Color32> colors;
+
+        public void Execute(int i)
+        {
+            int y = i / SIZE;
+            int x = i % SIZE;
+
+            float2 pos = float2(x, y) * 0.1234f;
+            colors[i] = new Color32((byte)(noise.cnoise(pos) * 256), 0, 0, 255);
+        }
+    }
+
+    const int SIZE = 512;
     const int TSIZE = SIZE * SIZE;
 
     NativeArray<Color32> colors;
 
     void Start()
     {
-        texture = new Texture2D(SIZE, SIZE);
+        texture = new Texture2D(SIZE, SIZE, UnityEngine.Experimental.Rendering.DefaultFormat.LDR, UnityEngine.Experimental.Rendering.TextureCreationFlags.None);
 
         colors = texture.GetRawTextureData<Color32>();
 
@@ -49,6 +67,6 @@ public class PixelDataTest : MonoBehaviour
 
     private void OnGUI()
     {
-        GUI.DrawTexture(new Rect(0, 0, 256, 256), texture);
+        GUI.DrawTexture(new Rect(0, 0, SIZE, SIZE), texture);
     }
 }
