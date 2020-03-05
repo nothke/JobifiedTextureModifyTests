@@ -15,14 +15,17 @@ public class PixelDataTest : MonoBehaviour
 
     NativeArray<Color32> colors;
     NativeArray<float> heights;
-    NativeArray<LargeStruct> largeStructs;
 
-    NativeArray<HalfStruct> halfStructs1;
-    NativeArray<HalfStruct> halfStructs2;
+    //NativeArray<LargeStruct> largeStructs;
+
+    //NativeArray<HalfStruct> halfStructs1;
+    //NativeArray<HalfStruct> halfStructs2;
 
     void Start()
     {
-        texture = new Texture2D(SIZE, SIZE, UnityEngine.Experimental.Rendering.DefaultFormat.LDR, UnityEngine.Experimental.Rendering.TextureCreationFlags.None);
+        texture = new Texture2D(SIZE, SIZE,
+            UnityEngine.Experimental.Rendering.DefaultFormat.LDR,
+            UnityEngine.Experimental.Rendering.TextureCreationFlags.None);
 
         colors = texture.GetRawTextureData<Color32>();
 
@@ -39,16 +42,20 @@ public class PixelDataTest : MonoBehaviour
             offset = Time.time * 20
         }.Schedule(TSIZE, 512).Complete();
 
+        /*
         largeStructs = new NativeArray<LargeStruct>(TSIZE, Allocator.Persistent);
 
         halfStructs1 = new NativeArray<HalfStruct>(TSIZE, Allocator.Persistent);
         halfStructs2 = new NativeArray<HalfStruct>(TSIZE, Allocator.Persistent);
+        */
     }
 
     private void OnDestroy()
     {
         heights.Dispose();
-        largeStructs.Dispose();
+        //largeStructs.Dispose();
+        //halfStruct1.Dispose();
+        //halfStruct2.Dispose();
     }
 
     int testi = 0;
@@ -63,6 +70,7 @@ public class PixelDataTest : MonoBehaviour
         testi++;
         Profiler.EndSample();
 
+        /*
         new LargeStructJobs.MultiValueRWSet()
         {
             largeStructs = largeStructs
@@ -83,6 +91,7 @@ public class PixelDataTest : MonoBehaviour
         Profiler.BeginSample("Copy to outside of job");
         halfStructs1.CopyTo(halfStructs2);
         Profiler.EndSample();
+        */
 
         new PixelJobs.CopyHeightsToPixelsJob()
         {
