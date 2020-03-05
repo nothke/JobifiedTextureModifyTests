@@ -28,7 +28,12 @@ public class PixelDataTest : MonoBehaviour
 
         heights = new NativeArray<float>(TSIZE, Allocator.Persistent);
 
-
+        new PixelJobs.SetNoiseHeightsJob()
+        {
+            heights = heights,
+            size = SIZE,
+            offset = Time.time * 20
+        }.Schedule(TSIZE, 512).Complete();
     }
 
     private void OnDestroy()
@@ -36,16 +41,17 @@ public class PixelDataTest : MonoBehaviour
         heights.Dispose();
     }
 
+    int testi = 0;
+
     private void Update()
     {
         //new PixelJobs.SetJob() { colors = colors }.Schedule(TSIZE, 512).Complete();
 
-        new PixelJobs.SetNoiseHeightsJob()
-        {
-            heights = heights,
-            size = SIZE,
-            offset = Time.time * 20
-        }.Schedule(TSIZE, 512).Complete();
+
+        Profiler.BeginSample("Set single pixel");
+        heights[testi] = 1;
+        testi++;
+        Profiler.EndSample();
 
         new PixelJobs.CopyHeightsToPixelsJob()
         {
