@@ -15,6 +15,10 @@ public class PixelDataTest : MonoBehaviour
 
     NativeArray<Color32> colors;
     NativeArray<float> heights;
+    NativeArray<LargeStruct> largeStructs;
+
+    NativeArray<HalfStruct> halfStructs1;
+    NativeArray<HalfStruct> halfStructs2;
 
     void Start()
     {
@@ -34,11 +38,17 @@ public class PixelDataTest : MonoBehaviour
             size = SIZE,
             offset = Time.time * 20
         }.Schedule(TSIZE, 512).Complete();
+
+        largeStructs = new NativeArray<LargeStruct>(TSIZE, Allocator.Persistent);
+
+        halfStructs1 = new NativeArray<HalfStruct>(TSIZE, Allocator.Persistent);
+        halfStructs2 = new NativeArray<HalfStruct>(TSIZE, Allocator.Persistent);
     }
 
     private void OnDestroy()
     {
         heights.Dispose();
+        largeStructs.Dispose();
     }
 
     int testi = 0;
@@ -53,6 +63,27 @@ public class PixelDataTest : MonoBehaviour
         testi++;
         Profiler.EndSample();
 
+        new LargeStructJobs.MultiValueRWSet()
+        {
+            largeStructs = largeStructs
+        }.Schedule(TSIZE, 512).Complete();
+
+        new LargeStructJobs.CopyHalfToHalf()
+        {
+            readStructs = halfStructs1,
+            writeStructs = halfStructs2
+        }.Schedule(TSIZE, 512).Complete();
+
+        new LargeStructJobs.CopyToInJob()
+        {
+            readStructs = halfStructs1,
+            writeStructs = halfStructs2
+        }.Schedule().Complete();
+
+        Profiler.BeginSample("Copy to outside of job");
+        halfStructs1.CopyTo(halfStructs2);
+        Profiler.EndSample();
+
         new PixelJobs.CopyHeightsToPixelsJob()
         {
             heights = heights,
@@ -63,6 +94,7 @@ public class PixelDataTest : MonoBehaviour
         Profiler.BeginSample("Texture Apply");
         texture.Apply(false);
         Profiler.EndSample();
+
     }
 
     private void OnGUI()
