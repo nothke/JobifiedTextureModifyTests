@@ -52,6 +52,8 @@ public class PixelDataTest : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (!enabled) return;
+
         heights.Dispose();
         //largeStructs.Dispose();
         //halfStruct1.Dispose();
@@ -93,12 +95,21 @@ public class PixelDataTest : MonoBehaviour
         Profiler.EndSample();
         */
 
+        new PixelJobs.SetNoiseHeightsJob()
+        {
+            heights = heights,
+            size = SIZE,
+            offset = Time.time * 20
+        }.Schedule(TSIZE, 512).Complete();
+
+        /*
         new PixelJobs.CopyHeightsToPixelsJob()
         {
             heights = heights,
             colors = colors,
             size = SIZE
         }.Schedule(TSIZE, 512).Complete();
+        */
 
         Profiler.BeginSample("Texture Apply");
         texture.Apply(false);

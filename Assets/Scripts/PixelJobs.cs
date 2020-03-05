@@ -93,5 +93,33 @@ public static class PixelJobs
         }
     }
 
+    [BurstCompile]
+    public struct SetHDRJob : IJobParallelFor
+    {
+        [WriteOnly] public NativeArray<half4> colors;
+        public int size;
 
+        public void Execute(int i)
+        {
+            colors[i] = new half4(half(1), half(0), half(0), half(1));
+        }
+    }
+
+    [BurstCompile]
+    public struct SetNoiseHDRJob : IJobParallelFor
+    {
+        [WriteOnly] public NativeArray<half4> colors;
+        public int size;
+
+        public float2 offset;
+
+        public void Execute(int i)
+        {
+            int y = i / size;
+            int x = i % size;
+
+            float2 pos = (float2(x, y) + offset) * 0.01234f;
+            colors[i] = half4(half(noise.snoise(pos)), half(0), half(0), half(1));
+        }
+    }
 }
