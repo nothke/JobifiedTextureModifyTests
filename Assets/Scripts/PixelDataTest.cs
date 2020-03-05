@@ -14,6 +14,7 @@ public class PixelDataTest : MonoBehaviour
     const int TSIZE = SIZE * SIZE;
 
     NativeArray<Color32> colors;
+    NativeArray<float> heights;
 
     void Start()
     {
@@ -24,11 +25,34 @@ public class PixelDataTest : MonoBehaviour
         new PixelJobs.SetJob() { colors = colors }.Schedule(TSIZE, 512).Complete();
 
         texture.Apply(false);
+
+        heights = new NativeArray<float>(TSIZE, Allocator.Persistent);
+
+
+    }
+
+    private void OnDestroy()
+    {
+        heights.Dispose();
     }
 
     private void Update()
     {
-        new PixelJobs.SetJob() { colors = colors }.Schedule(TSIZE, 512).Complete();
+        //new PixelJobs.SetJob() { colors = colors }.Schedule(TSIZE, 512).Complete();
+
+        new PixelJobs.SetNoiseHeightsJob()
+        {
+            heights = heights,
+            size = SIZE,
+            offset = Time.time * 20
+        }.Schedule(TSIZE, 512).Complete();
+
+        new PixelJobs.CopyHeightsToPixelsJob()
+        {
+            heights = heights,
+            colors = colors,
+            size = SIZE
+        }.Schedule(TSIZE, 512).Complete();
 
         Profiler.BeginSample("Texture Apply");
         texture.Apply(false);
