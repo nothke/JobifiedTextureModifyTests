@@ -74,6 +74,7 @@
 				return saturate(1 - abs((-center + t) / width));
 			}
 
+// Doesn't work because there is no way to set double4 from code??
 //#if defined(DOUBLE_PRECISION)
 //			double4 _PositionBounds;
 //#else
