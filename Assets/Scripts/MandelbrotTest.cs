@@ -36,6 +36,8 @@ public class MandelbrotTest : MonoBehaviour
             UnityEngine.Experimental.Rendering.DefaultFormat.LDR,
             UnityEngine.Experimental.Rendering.TextureCreationFlags.None);
 
+        texture.wrapMode = TextureWrapMode.Clamp;
+
         colors = texture.GetRawTextureData<Color32>();
 
         new PixelJobs.SetJob() { colors = colors }.Schedule(TSIZE, 512).Complete();
@@ -50,11 +52,9 @@ public class MandelbrotTest : MonoBehaviour
         Destroy(texture);
     }
 
-    int zoomLevel = 0;
-
-
+    int zoomLevel = -4;
     float zoom;
-    float smoothZoomLevel;
+    float smoothZoomLevel = -4;
 
     public double2 position;
     public double2 bounds;
@@ -62,6 +62,11 @@ public class MandelbrotTest : MonoBehaviour
     double2 lastMousePos;
 
     JobHandle schedule;
+
+    bool lastUpdateOnGPU;
+
+    public Renderer gpuQuad;
+    public Renderer cpuQuad;
 
     private void Update()
     {
@@ -83,6 +88,14 @@ public class MandelbrotTest : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space))
             updateOnGPU = !updateOnGPU;
+
+        if (updateOnGPU != lastUpdateOnGPU)
+        {
+            gpuQuad.enabled = updateOnGPU;
+            cpuQuad.enabled = !updateOnGPU;
+        }
+
+        lastUpdateOnGPU = updateOnGPU;
 
         if (!updateOnGPU)
         {
@@ -133,12 +146,6 @@ public class MandelbrotTest : MonoBehaviour
         texture.Apply(false);
         Profiler.EndSample();
     }
-
-    /*
-    private void OnGUI()
-    {
-        GUI.DrawTexture(new Rect(0, 0, SIZE, SIZE), texture);
-    }*/
 
     private void OnDrawGizmos()
     {

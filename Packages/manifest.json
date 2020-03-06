@@ -8,6 +8,8 @@
     "com.unity.textmeshpro": "2.0.1",
     "com.unity.timeline": "1.2.12",
     "com.unity.ugui": "1.0.0",
+    "nothke.fpscounter": "https://github.com/nothke/FPSCounter.git",
+    "nothke.protogui": "https://github.com/nothke/ProtoGUI.git",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
     "com.unity.modules.animation": "1.0.0",
@@ -39,5 +41,15 @@
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0"
+  },
+  "lock": {
+    "nothke.protogui": {
+      "revision": "HEAD",
+      "hash": "a1e4801427feed10ddea81ff394a31e6a0fb5889"
+    },
+    "nothke.fpscounter": {
+      "revision": "HEAD",
+      "hash": "1be1d3e78d64f1c3ff84b6d8bc1052c8ba70bc02"
+    }
   }
 }
