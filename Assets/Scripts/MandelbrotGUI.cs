@@ -17,6 +17,8 @@ public class MandelbrotGUI : WindowGUI
         draggable = false;
         windowRect.x = 10;
         windowRect.y = 10;
+        labelWidth = 60;
+        sliderNumberWidth = 30;
     }
     protected override void Window()
     {
@@ -25,5 +27,6 @@ public class MandelbrotGUI : WindowGUI
         if (m.updateOnGPU) GUI.enabled = false;
         m.finishJobInSameFrame = !ToggleButton("Melt My CPU", !m.finishJobInSameFrame);
         if (m.updateOnGPU) GUI.enabled = true;
+        Slider("Steps", ref m.threshold, 10, 400);
     }
 }

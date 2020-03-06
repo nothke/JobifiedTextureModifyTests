@@ -3,6 +3,7 @@
 	Properties
 	{
 		[Toggle(DOUBLE_PRECISION)] _DP("Double Precision", Float) = 0 // the name of the property (_Thingy in this case) doesn't seem to be relevant
+		//[IntRange] _FractalSteps("Steps", Range(5, 400)) = 100
 	}
 		SubShader
 	{
@@ -74,6 +75,8 @@
 				return saturate(1 - abs((-center + t) / width));
 			}
 
+			int _FractalSteps;
+
 // Doesn't work because there is no way to set double4 from code??
 //#if defined(DOUBLE_PRECISION)
 //			double4 _PositionBounds;
@@ -83,7 +86,7 @@
 
 			fixed4 frag(v2f i) : SV_Target
 			{
-				const int threshold = 100;
+				int threshold = _FractalSteps;
 
 #if defined(DOUBLE_PRECISION)
 				double2 position = _PositionBounds.xy;

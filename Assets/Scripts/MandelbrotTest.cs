@@ -117,6 +117,7 @@ public class MandelbrotTest : MonoBehaviour
         else
         {
             Shader.SetGlobalVector("_PositionBounds", float4(float2(outpos), float2(bounds)));
+            Shader.SetGlobalInt("_FractalSteps", threshold);
         }
     }
 
