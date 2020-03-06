@@ -26,6 +26,10 @@ public class MandelbrotTest : MonoBehaviour
     public bool finishJobInSameFrame = false;
     public bool doublePrecision = false;
 
+    public Material material;
+
+    public bool updateOnGPU;
+
     void Start()
     {
         texture = new Texture2D(SIZE, SIZE,
@@ -37,6 +41,13 @@ public class MandelbrotTest : MonoBehaviour
         new PixelJobs.SetJob() { colors = colors }.Schedule(TSIZE, 512).Complete();
 
         texture.Apply(false);
+
+        material.mainTexture = texture;
+    }
+
+    void OnDestroy()
+    {
+        Destroy(texture);
     }
 
     int zoomLevel = 0;
@@ -45,8 +56,8 @@ public class MandelbrotTest : MonoBehaviour
     float zoom;
     float smoothZoomLevel;
 
-    double2 position;
-    double2 bounds;
+    public double2 position;
+    public double2 bounds;
 
     double2 lastMousePos;
 
@@ -70,6 +81,21 @@ public class MandelbrotTest : MonoBehaviour
 
         double2 outpos = position - bounds / 2;
 
+        if (Input.GetKeyDown(KeyCode.Space))
+            updateOnGPU = !updateOnGPU;
+
+        if (!updateOnGPU)
+        {
+            UpdateCPU(outpos, bounds);
+        }
+        else
+        {
+            Shader.SetGlobalVector("_PositionBounds", float4(float2(outpos), float2(bounds)));
+        }
+    }
+
+    void UpdateCPU(double2 position, double2 bounds)
+    {
         if (!finishJobInSameFrame)
             schedule.Complete();
 
@@ -80,7 +106,7 @@ public class MandelbrotTest : MonoBehaviour
                 colors = colors,
                 size = SIZE,
                 bounds = bounds,
-                position = outpos,
+                position = position,
                 threshold = threshold,
                 gain = gain
             }.Schedule(TSIZE, 512);
@@ -92,7 +118,7 @@ public class MandelbrotTest : MonoBehaviour
                 colors = colors,
                 size = SIZE,
                 bounds = (float2)bounds,
-                position = (float2)outpos,
+                position = (float2)position,
                 threshold = threshold,
                 gain = gain
             }.Schedule(TSIZE, 512);
@@ -108,10 +134,11 @@ public class MandelbrotTest : MonoBehaviour
         Profiler.EndSample();
     }
 
+    /*
     private void OnGUI()
     {
         GUI.DrawTexture(new Rect(0, 0, SIZE, SIZE), texture);
-    }
+    }*/
 
     private void OnDrawGizmos()
     {
@@ -125,6 +152,6 @@ public class MandelbrotTest : MonoBehaviour
 
     static float Band(float start, float width, float t)
     {
-        return Unity.Mathematics.math.saturate(1 - Unity.Mathematics.math.abs((-start + t) / width));
+        return saturate(1 - abs((-start + t) / width));
     }
 }
