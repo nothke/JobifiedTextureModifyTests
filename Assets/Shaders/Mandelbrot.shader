@@ -2,6 +2,7 @@
 {
 	Properties
 	{
+		[Toggle(DOUBLE_PRECISION)] _DP("Double Precision", Float) = 0 // the name of the property (_Thingy in this case) doesn't seem to be relevant
 	}
 		SubShader
 	{
@@ -11,10 +12,12 @@
 		Pass
 		{
 			CGPROGRAM
+			#pragma target 4.5
 			#pragma vertex vert
 			#pragma fragment frag
 			// make fog work
-			#pragma multi_compile_fog
+			//#pragma multi_compile_fog
+			#pragma multi_compile __ DOUBLE_PRECISION
 
 			#include "UnityCG.cginc"
 
@@ -27,7 +30,7 @@
 			struct v2f
 			{
 				float2 uv : TEXCOORD0;
-				UNITY_FOG_COORDS(1)
+				//UNITY_FOG_COORDS(1)
 				float4 vertex : SV_POSITION;
 			};
 
@@ -36,15 +39,22 @@
 				v2f o;
 				o.vertex = UnityObjectToClipPos(v.vertex);
 				o.uv = v.uv;// TRANSFORM_TEX(v.uv, _MainTex);
-				UNITY_TRANSFER_FOG(o,o.vertex);
+				//UNITY_TRANSFER_FOG(o,o.vertex);
 				return o;
 			}
 
+#if defined(DOUBLE_PRECISION)
+			int Compute(double2 c, int threshold)
+			{
+				double
+#else
 			int Compute(float2 c, int threshold)
 			{
-				int iter = 0;
-				float r = 0, i = 0, rsqr = 0, isqr = 0;
+				float
+#endif
+					r = 0, i = 0, rsqr = 0, isqr = 0;
 
+				int iter = 0;
 				const float MAX_MAG_SQUARED = 10;
 
 				while ((iter < threshold) && (rsqr + isqr < MAX_MAG_SQUARED))
@@ -64,19 +74,31 @@
 				return saturate(1 - abs((-center + t) / width));
 			}
 
+//#if defined(DOUBLE_PRECISION)
+//			double4 _PositionBounds;
+//#else
 			float4 _PositionBounds;
+//#endif
 
 			fixed4 frag(v2f i) : SV_Target
 			{
-				// sample the texture
-				//fixed4 col = tex2D(_MainTex, i.uv);
+				const int threshold = 100;
+
+#if defined(DOUBLE_PRECISION)
+				double2 position = _PositionBounds.xy;
+				double2 bounds = _PositionBounds.zw;
+
+				double2 coord = position + bounds * i.uv;
+				int p = Compute(coord, threshold);
+				double v = saturate(p * 1.0 / threshold);
+#else
 				float2 position = _PositionBounds.xy;
 				float2 bounds = _PositionBounds.zw;
-				const int threshold = 100;
 
 				float2 coord = position + bounds * i.uv;
 				int p = Compute(coord, threshold);
 				float v = saturate(p * 1.0 / threshold);
+#endif
 
 				fixed r = Band(0.33f, 0.33f, v) + Band(1, 0.33f, v);
 				fixed g = Band(0.5f, 0.33f, v) + Band(1, 0.33f, v);

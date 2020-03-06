@@ -64,6 +64,7 @@ public class MandelbrotTest : MonoBehaviour
     JobHandle schedule;
 
     bool lastUpdateOnGPU;
+    bool lastPrecision;
 
     public Renderer gpuQuad;
     public Renderer cpuQuad;
@@ -77,7 +78,7 @@ public class MandelbrotTest : MonoBehaviour
         bounds = zoom;
 
         float2 mouse = (Vector2)Input.mousePosition;
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0) && !Nothke.ProtoGUI.GameWindow.IsMouseOverUI())
         {
             double2 diff = mouse - lastMousePos;
             position -= diff / SIZE * zoom;
@@ -96,6 +97,16 @@ public class MandelbrotTest : MonoBehaviour
         }
 
         lastUpdateOnGPU = updateOnGPU;
+
+        if (doublePrecision != lastPrecision)
+        {
+            if (doublePrecision)
+                Shader.EnableKeyword("DOUBLE_PRECISION");
+            else
+                Shader.DisableKeyword("DOUBLE_PRECISION");
+        }
+
+        lastPrecision = doublePrecision;
 
         if (!updateOnGPU)
         {
