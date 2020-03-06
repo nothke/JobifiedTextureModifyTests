@@ -10,7 +10,8 @@ using System.Runtime.CompilerServices;
 
 public class Mandelbrot : MonoBehaviour
 {
-    static int Compute(float xc, float yc, int threshold)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    static int Compute(float2 c, int threshold)
     {
         int iter = 0;
         float r = 0;
@@ -24,8 +25,8 @@ public class Mandelbrot : MonoBehaviour
         {
             r2 = r * r;
             i2 = i * i;
-            i = 2 * i * r + yc;
-            r = r2 - i2 + xc;
+            i = 2 * i * r + c.y;
+            r = r2 - i2 + c.x;
             iter++;
         }
 
@@ -44,20 +45,15 @@ public class Mandelbrot : MonoBehaviour
 
         public void Execute(int i)
         {
-            int y = i / size;
-            int x = i % size;
+            int2 texCoord = int2(i % size, i / size);
 
-            float xc = position.x + bounds.x * x / size;
-            float yc = position.y + bounds.y * y / size;
+            float2 coord = position + bounds * texCoord / size;
 
-            int thres = threshold;
-            int p = Compute(xc, yc, thres);
-
-            //colors[i] = p < thres ?
-            //new Color32(255, 255, 255, 255) :
-            //new Color32(0, 0, 0, 255);
+            int p = Compute(coord, threshold);
 
             float v = saturate(p * gain / threshold);
+
+            // Colors
 
             float r = Band(0.33f, 0.33f, v) + Band(1, 0.33f, v);
             float g = Band(0.5f, 0.33f, v) + Band(1, 0.33f, v);
@@ -70,6 +66,7 @@ public class Mandelbrot : MonoBehaviour
                 255);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static float Band(float center, float width, float t)
         {
             return saturate(1 - abs((-center + t) / width));
