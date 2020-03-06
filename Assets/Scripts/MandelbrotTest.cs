@@ -25,10 +25,10 @@ public class MandelbrotTest : MonoBehaviour
 
     public bool finishJobInSameFrame = false;
     public bool doublePrecision = false;
+    public bool updateOnGPU;
 
     public Material material;
 
-    public bool updateOnGPU;
 
     void Start()
     {
@@ -68,6 +68,8 @@ public class MandelbrotTest : MonoBehaviour
 
     public Renderer gpuQuad;
     public Renderer cpuQuad;
+
+    bool lastInFrame;
 
     private void Update()
     {
@@ -120,7 +122,7 @@ public class MandelbrotTest : MonoBehaviour
 
     void UpdateCPU(double2 position, double2 bounds)
     {
-        if (!finishJobInSameFrame)
+        if (!finishJobInSameFrame || !lastInFrame)
             schedule.Complete();
 
         if (doublePrecision)
@@ -156,6 +158,8 @@ public class MandelbrotTest : MonoBehaviour
         Profiler.BeginSample("Texture Apply");
         texture.Apply(false);
         Profiler.EndSample();
+
+        lastInFrame = finishJobInSameFrame;
     }
 
     private void OnDrawGizmos()

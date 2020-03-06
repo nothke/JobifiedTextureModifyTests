@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Mandelbrot.unity
+    guid: 8bbf2536c03580b479404b2ee71ccf0f
   m_configObjects: {}

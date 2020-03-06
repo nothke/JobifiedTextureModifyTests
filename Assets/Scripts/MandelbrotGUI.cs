@@ -22,5 +22,8 @@ public class MandelbrotGUI : WindowGUI
     {
         m.updateOnGPU = GUILayout.SelectionGrid(m.updateOnGPU ? 1 : 0, cpugpuText, 2) == 1;
         m.doublePrecision = GUILayout.SelectionGrid(m.doublePrecision ? 1 : 0, precisionText, 2) == 1;
+        if (m.updateOnGPU) GUI.enabled = false;
+        m.finishJobInSameFrame = !ToggleButton("Melt My CPU", !m.finishJobInSameFrame);
+        if (m.updateOnGPU) GUI.enabled = true;
     }
 }

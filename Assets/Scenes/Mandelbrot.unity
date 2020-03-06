@@ -498,7 +498,7 @@ MonoBehaviour:
   fontTexture: {fileID: 2800000, guid: dd9a390ef7fd2244aa51640b83c9dcca, type: 3}
   pixelScale: 4
   thresholdFPS: 60
-  schedule: 1
+  schedule: 0
 --- !u!1 &1563625706
 GameObject:
   m_ObjectHideFlags: 0
