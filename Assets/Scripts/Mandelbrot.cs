@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Unity.Burst;
+﻿using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
@@ -8,7 +6,7 @@ using Unity.Mathematics;
 using static Unity.Mathematics.math;
 using System.Runtime.CompilerServices;
 
-public class Mandelbrot : MonoBehaviour
+public static class Mandelbrot
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     static int Compute(float2 c, int threshold)
