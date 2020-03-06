@@ -224,6 +224,7 @@ GameObject:
   - component: {fileID: 777422239}
   - component: {fileID: 777422238}
   - component: {fileID: 777422240}
+  - component: {fileID: 777422241}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -238,7 +239,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 777422237}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ea5515162ba74da40a053d2298db38cd, type: 3}
   m_Name: 
@@ -271,6 +272,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   texture: {fileID: 0}
+--- !u!114 &777422241
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 777422237}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddb07b3725ff4014da7939cfa1aae2ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  texture: {fileID: 0}
+  rect:
+    serializedVersion: 2
+    x: -2
+    y: -1
+    width: 2
+    height: 2
+  threshold: 100
+  gain: 1
+  bandTest: 0.51
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0

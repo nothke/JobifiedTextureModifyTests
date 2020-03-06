@@ -95,11 +95,20 @@ public class PixelDataTest : MonoBehaviour
         Profiler.EndSample();
         */
 
+        /*
         new PixelJobs.SetNoiseHeightsJob()
         {
             heights = heights,
             size = SIZE,
             offset = Time.time * 20
+        }.Schedule(TSIZE, 512).Complete();
+        */
+
+        new Mandelbrot.Job()
+        {
+            colors = colors,
+            size = SIZE,
+            bounds = new Unity.Mathematics.float2(1000, 1000)
         }.Schedule(TSIZE, 512).Complete();
 
         /*
