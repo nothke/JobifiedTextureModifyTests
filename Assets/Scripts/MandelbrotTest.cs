@@ -6,11 +6,13 @@ using UnityEngine.Profiling;
 using Unity.Collections;
 using Unity.Jobs;
 
+using Unity.Mathematics;
+using static Unity.Mathematics.math;
+
 public class MandelbrotTest : MonoBehaviour
 {
     public Texture2D texture;
 
-    public Rect rect;
     public int threshold;
     public float gain;
 
@@ -20,6 +22,9 @@ public class MandelbrotTest : MonoBehaviour
     NativeArray<Color32> colors;
 
     public float bandTest = 0;
+
+    public bool finishJobInSameFrame = false;
+    public bool doublePrecision = false;
 
     void Start()
     {
@@ -36,12 +41,14 @@ public class MandelbrotTest : MonoBehaviour
 
     int zoomLevel = 0;
 
-    float x;
-    float y;
-    Vector2 lastMousePos;
 
     float zoom;
     float smoothZoomLevel;
+
+    double2 position;
+    double2 bounds;
+
+    double2 lastMousePos;
 
     JobHandle schedule;
 
@@ -51,33 +58,54 @@ public class MandelbrotTest : MonoBehaviour
         smoothZoomLevel = Mathf.Lerp(smoothZoomLevel, zoomLevel, Time.deltaTime * 4);
         zoom = Mathf.Exp(-smoothZoomLevel) * 0.1f;
 
-        rect.size = Vector2.one * zoom;
-        rect.position = new Vector2(x, y) - rect.size / 2;
+        bounds = zoom;
 
-        Vector2 mouse = Input.mousePosition;
+        float2 mouse = (Vector2)Input.mousePosition;
         if (Input.GetMouseButton(0))
         {
-            Vector2 diff = mouse - lastMousePos;
-            x -= diff.x / SIZE * zoom;
-            y -= diff.y / SIZE * zoom;
+            double2 diff = mouse - lastMousePos;
+            position -= diff / SIZE * zoom;
         }
         lastMousePos = mouse;
-        
-        schedule.Complete();
+
+        double2 outpos = position - bounds / 2;
+
+        if (!finishJobInSameFrame)
+            schedule.Complete();
+
+        if (doublePrecision)
+        {
+            schedule = new Mandelbrot.JobDouble()
+            {
+                colors = colors,
+                size = SIZE,
+                bounds = bounds,
+                position = outpos,
+                threshold = threshold,
+                gain = gain
+            }.Schedule(TSIZE, 512);
+        }
+        else
+        {
+            schedule = new Mandelbrot.Job()
+            {
+                colors = colors,
+                size = SIZE,
+                bounds = (float2)bounds,
+                position = (float2)outpos,
+                threshold = threshold,
+                gain = gain
+            }.Schedule(TSIZE, 512);
+        }
+
+        if (finishJobInSameFrame)
+        {
+            schedule.Complete();
+        }
 
         Profiler.BeginSample("Texture Apply");
         texture.Apply(false);
         Profiler.EndSample();
-
-        schedule = new Mandelbrot.Job()
-        {
-            colors = colors,
-            size = SIZE,
-            bounds = rect.size,
-            position = rect.position,
-            threshold = threshold,
-            gain = gain
-        }.Schedule(TSIZE, 512);
     }
 
     private void OnGUI()

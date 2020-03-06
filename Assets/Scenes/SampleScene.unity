@@ -285,15 +285,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   texture: {fileID: 0}
-  rect:
-    serializedVersion: 2
-    x: -2
-    y: -1
-    width: 2
-    height: 2
   threshold: 100
   gain: 1
   bandTest: 0.51
+  finishJobInSameFrame: 1
+  doublePrecision: 1
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
