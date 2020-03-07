@@ -77,20 +77,36 @@
 
 			int _FractalSteps;
 
-// Doesn't work because there is no way to set double4 from code??
-//#if defined(DOUBLE_PRECISION)
-//			double4 _PositionBounds;
-//#else
+			// Doesn't work because there is no way to set double4 from code??
+#if defined(DOUBLE_PRECISION)
+			//double4 _PositionBounds;
+			int _PosX_Lo;
+			int _PosX_Hi;
+			int _PosY_Lo;
+			int _PosY_Hi;
+
+			int _BndX_Lo;
+			int _BndX_Hi;
+			int _BndY_Lo;
+			int _BndY_Hi;
+
+			double2 ints2double2(int xlo, int xhi, int ylo, int yhi)
+			{
+				return double2(
+					asdouble(asuint(xlo), asuint(xhi)), 
+					asdouble(asuint(ylo), asuint(yhi)));
+			}
+#else
 			float4 _PositionBounds;
-//#endif
+#endif
 
 			fixed4 frag(v2f i) : SV_Target
 			{
 				int threshold = _FractalSteps;
 
 #if defined(DOUBLE_PRECISION)
-				double2 position = _PositionBounds.xy;
-				double2 bounds = _PositionBounds.zw;
+				double2 position = ints2double2(_PosX_Lo, _PosX_Hi, _PosY_Lo, _PosY_Hi);
+				double2 bounds = ints2double2(_BndX_Lo, _BndX_Hi, _BndY_Lo, _BndY_Hi);
 
 				double2 coord = position + bounds * i.uv;
 				int p = Compute(coord, threshold);

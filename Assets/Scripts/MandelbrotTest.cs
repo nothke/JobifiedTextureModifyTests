@@ -116,9 +116,72 @@ public class MandelbrotTest : MonoBehaviour
         }
         else
         {
-            Shader.SetGlobalVector("_PositionBounds", float4(float2(outpos), float2(bounds)));
+            ulong l = asulong(outpos.x);
+
+            if (doublePrecision)
+            {
+                //uint4 splitPos = double2_to_uint4(outpos);
+                //uint4 splitBounds = double2_to_uint4(bounds);
+
+                int4 splitPos = double2_to_int4(outpos);
+                int4 splitBnd = double2_to_int4(bounds);
+
+                Shader.SetGlobalInt("_PosX_Lo", splitPos.x);
+                Shader.SetGlobalInt("_PosX_Hi", splitPos.y);
+                Shader.SetGlobalInt("_PosY_Lo", splitPos.z);
+                Shader.SetGlobalInt("_PosY_Hi", splitPos.w);
+
+                Shader.SetGlobalInt("_BndX_Lo", splitBnd.x);
+                Shader.SetGlobalInt("_BndX_Hi", splitBnd.y);
+                Shader.SetGlobalInt("_BndY_Lo", splitBnd.z);
+                Shader.SetGlobalInt("_BndY_Hi", splitBnd.w);
+
+                Debug.Log(GetHex(outpos.x));
+                Debug.Log(GetHex(splitPos.x) + " " + GetHex(splitPos.y));
+                //Debug.Log(System.BitConverter.DoubleToInt64Bits(outpos.x));
+            }
+            else
+            {
+                Shader.SetGlobalVector("_PositionBounds", float4(float2(outpos), float2(bounds)));
+            }
+
             Shader.SetGlobalInt("_FractalSteps", threshold);
         }
+    }
+
+    static string GetHex(double v)
+    { return System.BitConverter.ToString(System.BitConverter.GetBytes(v)); }
+    static string GetHex(int v)
+    { return System.BitConverter.ToString(System.BitConverter.GetBytes(v)); }
+
+    const string formatter = "{0,25:E16}{1,23:X16}";
+
+    static uint4 double2_to_uint4(in double2 d)
+    {
+        return uint4(
+            ulong_to_uint2(asulong(d.x)),
+            ulong_to_uint2(asulong(d.y)));
+    }
+
+    static int4 double2_to_int4(in double2 d)
+    {
+        return int4(
+            long_to_int2(aslong(d.x)),
+            long_to_int2(aslong(d.y)));
+    }
+
+    static int2 long_to_int2(in long a)
+    {
+        return int2(
+            (int)(a & uint.MaxValue),
+            (int)(a >> 32));
+    }
+
+    static uint2 ulong_to_uint2(in ulong a)
+    {
+        return uint2(
+            (uint)(a & uint.MaxValue),
+            (uint)(a >> 32));
     }
 
     void UpdateCPU(double2 position, double2 bounds)
