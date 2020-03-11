@@ -78,22 +78,7 @@
 			int _FractalSteps;
 
 #if defined(DOUBLE_PRECISION)
-			int _PosX_Lo;
-			int _PosX_Hi;
-			int _PosY_Lo;
-			int _PosY_Hi;
-
-			int _BndX_Lo;
-			int _BndX_Hi;
-			int _BndY_Lo;
-			int _BndY_Hi;
-
-			double2 ints2double2(int xlo, int xhi, int ylo, int yhi)
-			{
-				return double2(
-					asdouble(asuint(xlo), asuint(xhi)), 
-					asdouble(asuint(ylo), asuint(yhi)));
-			}
+			StructuredBuffer<double> _PositionBoundsDouble;
 #else
 			float4 _PositionBounds;
 #endif
@@ -103,8 +88,8 @@
 				int threshold = _FractalSteps;
 
 #if defined(DOUBLE_PRECISION)
-				double2 position = ints2double2(_PosX_Lo, _PosX_Hi, _PosY_Lo, _PosY_Hi);
-				double2 bounds = ints2double2(_BndX_Lo, _BndX_Hi, _BndY_Lo, _BndY_Hi);
+				double2 position = double2(_PositionBoundsDouble[0], _PositionBoundsDouble[1]);
+				double2 bounds = double2(_PositionBoundsDouble[2], _PositionBoundsDouble[3]);
 
 				double2 
 #else

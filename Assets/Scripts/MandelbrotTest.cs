@@ -29,6 +29,8 @@ public class MandelbrotTest : MonoBehaviour
 
     public Material material;
 
+    double[] positionBoundsArray;
+    ComputeBuffer positionBoundsBuffer;
 
     void Start()
     {
@@ -45,11 +47,15 @@ public class MandelbrotTest : MonoBehaviour
         texture.Apply(false);
 
         material.mainTexture = texture;
+
+        positionBoundsBuffer = new ComputeBuffer(4, sizeof(double));
+        positionBoundsArray = new double[4];
     }
 
     void OnDestroy()
     {
         Destroy(texture);
+        positionBoundsBuffer.Dispose();
     }
 
     int zoomLevel = -4;
@@ -118,22 +124,14 @@ public class MandelbrotTest : MonoBehaviour
         {
             if (doublePrecision)
             {
-                int4 splitPos = double2_to_int4(outpos);
-                int4 splitBnd = double2_to_int4(bounds);
+                positionBoundsArray[0] = outpos.x;
+                positionBoundsArray[1] = outpos.y;
+                positionBoundsArray[2] = bounds.x;
+                positionBoundsArray[3] = bounds.y;
 
-                Shader.SetGlobalInt("_PosX_Lo", splitPos.x);
-                Shader.SetGlobalInt("_PosX_Hi", splitPos.y);
-                Shader.SetGlobalInt("_PosY_Lo", splitPos.z);
-                Shader.SetGlobalInt("_PosY_Hi", splitPos.w);
+                positionBoundsBuffer.SetData(positionBoundsArray);
 
-                Shader.SetGlobalInt("_BndX_Lo", splitBnd.x);
-                Shader.SetGlobalInt("_BndX_Hi", splitBnd.y);
-                Shader.SetGlobalInt("_BndY_Lo", splitBnd.z);
-                Shader.SetGlobalInt("_BndY_Hi", splitBnd.w);
-
-                Debug.Log(GetHex(outpos.x));
-                Debug.Log(GetHex(splitPos.x) + " " + GetHex(splitPos.y));
-                //Debug.Log(System.BitConverter.DoubleToInt64Bits(outpos.x));
+                Shader.SetGlobalBuffer("_PositionBoundsDouble", positionBoundsBuffer);
             }
             else
             {
