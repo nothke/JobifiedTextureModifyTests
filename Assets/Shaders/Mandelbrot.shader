@@ -77,9 +77,7 @@
 
 			int _FractalSteps;
 
-			// Doesn't work because there is no way to set double4 from code??
 #if defined(DOUBLE_PRECISION)
-			//double4 _PositionBounds;
 			int _PosX_Lo;
 			int _PosX_Hi;
 			int _PosY_Lo;
@@ -108,17 +106,16 @@
 				double2 position = ints2double2(_PosX_Lo, _PosX_Hi, _PosY_Lo, _PosY_Hi);
 				double2 bounds = ints2double2(_BndX_Lo, _BndX_Hi, _BndY_Lo, _BndY_Hi);
 
-				double2 coord = position + bounds * i.uv;
-				int p = Compute(coord, threshold);
-				double v = saturate(p * 1.0 / threshold);
+				double2 
 #else
 				float2 position = _PositionBounds.xy;
 				float2 bounds = _PositionBounds.zw;
 
-				float2 coord = position + bounds * i.uv;
-				int p = Compute(coord, threshold);
-				float v = saturate(p * 1.0 / threshold);
+				float2
 #endif
+					coord = position + bounds * i.uv;
+				int p = Compute(coord, threshold);
+				float v = saturate((p * 1.0) / threshold);
 
 				fixed r = Band(0.33f, 0.33f, v) + Band(1, 0.33f, v);
 				fixed g = Band(0.5f, 0.33f, v) + Band(1, 0.33f, v);

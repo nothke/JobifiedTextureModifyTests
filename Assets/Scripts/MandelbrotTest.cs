@@ -116,13 +116,8 @@ public class MandelbrotTest : MonoBehaviour
         }
         else
         {
-            ulong l = asulong(outpos.x);
-
             if (doublePrecision)
             {
-                //uint4 splitPos = double2_to_uint4(outpos);
-                //uint4 splitBounds = double2_to_uint4(bounds);
-
                 int4 splitPos = double2_to_int4(outpos);
                 int4 splitBnd = double2_to_int4(bounds);
 
@@ -156,18 +151,25 @@ public class MandelbrotTest : MonoBehaviour
 
     const string formatter = "{0,25:E16}{1,23:X16}";
 
+    /*
     static uint4 double2_to_uint4(in double2 d)
     {
         return uint4(
             ulong_to_uint2(asulong(d.x)),
             ulong_to_uint2(asulong(d.y)));
-    }
+    }*/
 
     static int4 double2_to_int4(in double2 d)
     {
         return int4(
-            long_to_int2(aslong(d.x)),
-            long_to_int2(aslong(d.y)));
+            long_to_int2(tolong(d.x)),
+            long_to_int2(tolong(d.y)));
+    }
+
+    static long tolong(double d)
+    {
+        return aslong(d);
+        //return System.BitConverter.DoubleToInt64Bits(d);
     }
 
     static int2 long_to_int2(in long a)
@@ -177,12 +179,13 @@ public class MandelbrotTest : MonoBehaviour
             (int)(a >> 32));
     }
 
+    /*
     static uint2 ulong_to_uint2(in ulong a)
     {
         return uint2(
             (uint)(a & uint.MaxValue),
             (uint)(a >> 32));
-    }
+    }*/
 
     void UpdateCPU(double2 position, double2 bounds)
     {
